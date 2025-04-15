@@ -20,17 +20,18 @@ namespace PMexam
             InitializeComponent();
             this.applicantId = applicantId;
             LoadApplicantData();
+            LoadWorkers();
+            LoadDirections();
         }
 
         private void LoadApplicantData()
         {
-            // Открываем соединение для первого запроса
             using (var conn = Database.GetConnection())
             {
                 var cmd = new NpgsqlCommand(@"
                     SELECT full_name, email, phone, passport, snils, parent_name,
                            graduated_from, education_level, average_score,
-                           application_status, comment
+                           application_status, comment, executor_id
                     FROM applicants
                     WHERE id = @id", conn);
                 cmd.Parameters.AddWithValue("id", applicantId);
@@ -50,16 +51,21 @@ namespace PMexam
                         cbStatus.SelectedItem = reader["application_status"].ToString();
                         txtComment.Text = reader["comment"].ToString();
 
+                        int executorId = reader["executor_id"] != DBNull.Value ? (int?)reader["executor_id"] ?? 0 : 0;
+                        if (executorId > 0)
+                        {
+                            cbExecutor.SelectedValue = executorId;
+                        }
+
                         string educationLevel = reader["education_level"].ToString();
 
-                        // Скрытие/показ элементов в зависимости от уровня образования
                         if (educationLevel == "Бакалавриат" || educationLevel == "Специалитет")
                         {
                             label10.Visible = lblAverage_score.Visible = false;
                             lblEGEsubject1.Visible = lblEGEscore1.Visible = true;
                             lblEGEsubject2.Visible = lblEGEscore2.Visible = true;
                             lblEGEsubject3.Visible = lblEGEscore3.Visible = true;
-                            LoadEGEScores(); // Загружаем данные по ЕГЭ
+                            LoadEGEScores();
                         }
                         else if (educationLevel == "СПО" || educationLevel == "Магистратура")
                         {
@@ -67,13 +73,12 @@ namespace PMexam
                             lblEGEsubject2.Visible = lblEGEscore2.Visible = false;
                             lblEGEsubject3.Visible = lblEGEscore3.Visible = false;
                             label10.Visible = lblAverage_score.Visible = true;
-                            lblAverage_score.Text = reader["average_score"].ToString(); // Показываем средний балл
+                            lblAverage_score.Text = reader["average_score"].ToString();
                         }
                     }
                 }
             }
 
-            // Открываем новое соединение для второго запроса (по направлениям)
             using (var conn2 = Database.GetConnection())
             {
                 var dirCmd = new NpgsqlCommand(@"
@@ -93,9 +98,51 @@ namespace PMexam
             }
         }
 
+        private void LoadWorkers()
+        {
+            List<KeyValuePair<int, string>> workers = new List<KeyValuePair<int, string>>();
+
+            using (var conn = Database.GetConnection())
+            {
+                var cmd = new NpgsqlCommand("SELECT id, login FROM users WHERE role = 'Работник'", conn);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        workers.Add(new KeyValuePair<int, string>((int)reader["id"], reader["login"].ToString()));
+                    }
+                }
+            }
+
+            cbExecutor.DataSource = workers;
+            cbExecutor.DisplayMember = "Value";
+            cbExecutor.ValueMember = "Key";
+        }
+
+        private void LoadDirections()
+        {
+            using (var conn = Database.GetConnection())
+            {
+                var dirCmd = new NpgsqlCommand(@"
+                    SELECT unnest(directions) AS direction_name
+                    FROM applicants
+                    WHERE id = @id", conn);
+                dirCmd.Parameters.AddWithValue("id", applicantId);
+
+                using (var dirReader = dirCmd.ExecuteReader())
+                {
+                    lbDirections.Items.Clear();
+                    while (dirReader.Read())
+                    {
+                        lbDirections.Items.Add(dirReader["direction_name"].ToString());
+                    }
+                }
+            }
+        }
+
         private void LoadEGEScores()
         {
-            // Открываем новое соединение для запроса по ЕГЭ
             using (var conn3 = Database.GetConnection())
             {
                 var egeCmd = new NpgsqlCommand(@"
@@ -134,23 +181,23 @@ namespace PMexam
         {
             string selectedStatus = cbStatus.SelectedItem.ToString();
             string comment = txtComment.Text;
+            int selectedExecutorId = (int)cbExecutor.SelectedValue;
 
-            // Подключение к базе данных для обновления
             using (var conn = Database.GetConnection())
             {
                 var updateCmd = new NpgsqlCommand(@"
                     UPDATE applicants
-                    SET application_status = @status, comment = @comment
+                    SET application_status = @status, comment = @comment, executor_id = @executor_id
                     WHERE id = @id", conn);
                 updateCmd.Parameters.AddWithValue("status", selectedStatus);
                 updateCmd.Parameters.AddWithValue("comment", comment);
+                updateCmd.Parameters.AddWithValue("executor_id", selectedExecutorId);
                 updateCmd.Parameters.AddWithValue("id", applicantId);
 
-                // Выполняем команду обновления
                 updateCmd.ExecuteNonQuery();
             }
 
-            MessageBox.Show("Статус обновлен успешно!");
+            MessageBox.Show("Статус и исполнитель обновлены успешно!");
         }
 
         private void cbStatus_SelectedIndexChanged(object sender, EventArgs e)

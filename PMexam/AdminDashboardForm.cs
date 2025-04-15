@@ -24,6 +24,8 @@ namespace PMexam
             dgvStatements.Columns.Add("application_status", "Статус");
             dgvStatements.Columns.Add("education_level", "Уровень образования");
             dgvStatements.Columns.Add("SubmissionDate", "Дата подачи");
+            cbSearchFilter.Items.AddRange(new string[] { "ФИО", "Email", "Телефон" });
+            cbSearchFilter.SelectedIndex = 0;
             LoadApplications();
         }
 
@@ -42,8 +44,55 @@ namespace PMexam
                 {
                     if (filterDate.HasValue)
                     {
-                        cmd.Parameters.AddWithValue("filterDate", filterDate.Value.Date); // обрезаем время
+                        cmd.Parameters.AddWithValue("filterDate", filterDate.Value.Date);
                     }
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        dgvStatements.Rows.Clear();
+                        while (reader.Read())
+                        {
+                            dgvStatements.Rows.Add(
+                                reader["id"],
+                                reader["full_name"].ToString(),
+                                reader["email"].ToString(),
+                                reader["phone"].ToString(),
+                                reader["application_status"].ToString(),
+                                reader["education_level"].ToString(),
+                                Convert.ToDateTime(reader["submission_date"]).ToString("dd.MM.yyyy")
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SearchApplications()
+        {
+            string keyword = txtSearch.Text.Trim().ToLower();
+            string filter = cbSearchFilter.SelectedItem?.ToString();
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                LoadApplications();
+                return;
+            }
+
+            string column = filter switch
+            {
+                "ФИО" => "LOWER(full_name)",
+                "Email" => "LOWER(email)",
+                "Телефон" => "LOWER(phone)",
+                _ => ""
+            };
+
+            using (var conn = Database.GetConnection())
+            {
+                string query = $"SELECT id, full_name, email, phone, application_status, education_level, submission_date FROM applicants WHERE {column} LIKE @keyword";
+
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("keyword", $"%{keyword}%");
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -85,6 +134,18 @@ namespace PMexam
 
                 LoadApplications();
             }
+        }
+
+        private void btnManage_Click(object sender, EventArgs e)
+        {
+
+            new ManageDirectionsForm().ShowDialog();
+        }
+
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            SearchApplications();
         }
     }
 }

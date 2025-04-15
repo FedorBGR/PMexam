@@ -38,7 +38,7 @@ namespace PMexam
 
                         string comment = reader["comment"]?.ToString();
 
-                        if (lblStatus.Text == "В ДОРАБОТКЕ" && !string.IsNullOrWhiteSpace(comment))
+                        if (lblStatus.Text == "В ДОРАБОТКУ" && !string.IsNullOrWhiteSpace(comment))
                         {
                             lblComment.Text = "Комментарий: " + comment;
                             lblComment.Visible = true;
@@ -49,7 +49,6 @@ namespace PMexam
                             lblComment.Visible = false;
                         }
 
-                        // Отображение направлений
                         string[] directions = (string[])reader["directions"];
                         lbDirections.Items.Clear();
                         lbDirections.Items.AddRange(directions);
@@ -100,7 +99,6 @@ namespace PMexam
                 doc.Save(path);
                 MessageBox.Show("PDF-документ сохранён.", "Готово", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Открыть документ
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
                 {
                     FileName = path,

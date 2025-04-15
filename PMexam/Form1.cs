@@ -35,7 +35,6 @@ namespace PMexam
 
                         if (PasswordHelper.VerifyPassword(password, storedHash))
                         {
-                            // Переход в нужную часть системы
                             if (role == "Абитуриент")
                                 new ApplicantDashboardForm(userId).Show();
                             else

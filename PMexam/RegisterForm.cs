@@ -64,10 +64,10 @@ namespace PMexam
         {
             string selected = cboEducationLevel.SelectedItem.ToString();
 
-            panelEGE.Visible = (selected == "Бакалавриат" || selected == "Специалитет");
-            numAvgScore.Visible = (selected == "СПО" || selected == "Магистратура");
-            lblAvgScore.Visible = (selected == "СПО" || selected == "Магистратура");
-            lblEGE.Visible = (selected == "Бакалавриат" || selected == "Специалитет");
+            panelEGE.Visible = (selected == "БАКАЛАВРИАТ" || selected == "СПЕЦИАЛИТЕТ");
+            numAvgScore.Visible = (selected == "СПО" || selected == "МАГИСТРАТУРА");
+            lblAvgScore.Visible = (selected == "СПО" || selected == "МАГИСТРАТУРА");
+            lblEGE.Visible = (selected == "БАКАЛАВРИАТ" || selected == "СПЕЦИАЛИТЕТ");
 
             if (selected == "СПО")
                 numAvgScore.Maximum = 5;
@@ -108,7 +108,7 @@ namespace PMexam
 
         private bool ValidateInputFields()
         {
-            // Проверка ФИО абитуриента
+    
             if (!Regex.IsMatch(txtFullName.Text.Trim(), @"^[А-Яа-яЁё\s\-]+$"))
             {
                 MessageBox.Show("Поле 'Полное имя' должно содержать только буквы, пробелы и дефисы.", "Поле пустое или заполнено неверно", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -116,7 +116,7 @@ namespace PMexam
                 return false;
             }
 
-            // Проверка ФИО родителя
+            
             if (!Regex.IsMatch(txtParentName.Text.Trim(), @"^[А-Яа-яЁё\s\-]+$"))
             {
                 MessageBox.Show("Поле 'ФИО родителя' должно содержать только буквы, пробелы и дефисы.", "Поле пустое или заполнено неверно", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -124,7 +124,7 @@ namespace PMexam
                 return false;
             }
 
-            // Проверка email
+            
             if (!Regex.IsMatch(txtEmail.Text.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
                 MessageBox.Show("Введите корректный адрес электронной почты.", "Поле пустое или заполнено неверно", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -160,7 +160,7 @@ namespace PMexam
                     return false;
                 }
             }
-            else // Бакалавриат и Специалитет
+            else 
             {
                 ComboBox[] egeBoxes = { cboEGE1, cboEGE2, cboEGE3 };
                 NumericUpDown[] scoreBoxes = { numScoreEGE1, numScoreEGE2, numScoreEGE3 };
@@ -254,15 +254,15 @@ namespace PMexam
                     egeSubjects.Add(box.SelectedItem.ToString());
             }
 
-            foreach (var scoreBox in scoreBoxes) // предполагается, что есть список TextBox'ов по баллам
+            foreach (var scoreBox in scoreBoxes)
             {
                 if (int.TryParse(scoreBox.Text.Trim(), out int score))
                     egeScores.Add(score);
                 else
-                    egeScores.Add(0); // или покажи ошибку, если обязательно
+                    egeScores.Add(0);
             }
 
-            var documentPaths = uploadedPdfPaths.ToList(); // предполагается, что ты уже собираешь документы где-то
+            var documentPaths = uploadedPdfPaths.ToList();
 
             string generatedLogin, generatedPassword;
 
@@ -276,7 +276,7 @@ namespace PMexam
             if (success)
             {
                 MessageBox.Show($"Регистрация прошла успешно!\nВаш логин: {generatedLogin}\nПароль: {generatedPassword}", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close(); // или очистить поля, если хочешь остаться на форме
+                this.Close();
             }
         }
 
@@ -368,7 +368,6 @@ namespace PMexam
                                     applicantId = (int)getApplicantIdCmd.ExecuteScalar();
                                 }
 
-                                // Для каждого названия направления — получим его id и вставим в applicant_directions
                                 foreach (var directionName in directions)
                                 {
                                     int directionId;

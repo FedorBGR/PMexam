@@ -59,6 +59,8 @@
             btSave = new Button();
             lblDirection = new Label();
             lblcom = new Label();
+            cbExecutor = new ComboBox();
+            label11 = new Label();
             SuspendLayout();
             // 
             // lblFullName
@@ -372,11 +374,32 @@
             lblcom.TabIndex = 31;
             lblcom.Text = "Комментарий на случай доработки";
             // 
+            // cbExecutor
+            // 
+            cbExecutor.FormattingEnabled = true;
+            cbExecutor.Items.AddRange(new object[] { "ПОДАНО", "ГОТОВО", "В ДОРАБОТКУ" });
+            cbExecutor.Location = new Point(969, 249);
+            cbExecutor.Name = "cbExecutor";
+            cbExecutor.Size = new Size(135, 23);
+            cbExecutor.TabIndex = 32;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            label11.Location = new Point(847, 251);
+            label11.Name = "label11";
+            label11.Size = new Size(116, 21);
+            label11.TabIndex = 33;
+            label11.Text = "Исполнитель";
+            // 
             // ApplicationReviewForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1264, 681);
+            Controls.Add(label11);
+            Controls.Add(cbExecutor);
             Controls.Add(lblcom);
             Controls.Add(lblDirection);
             Controls.Add(btSave);
@@ -447,5 +470,7 @@
         private Button btSave;
         private Label lblDirection;
         private Label lblcom;
+        private ComboBox cbExecutor;
+        private Label label11;
     }
 }

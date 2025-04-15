@@ -272,6 +272,7 @@
             // 
             // numAvgScore
             // 
+            numAvgScore.DecimalPlaces = 2;
             numAvgScore.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
             numAvgScore.Location = new Point(318, 479);
             numAvgScore.Name = "numAvgScore";
@@ -292,16 +293,16 @@
             // 
             clbDirections.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
             clbDirections.FormattingEnabled = true;
-            clbDirections.Location = new Point(668, 149);
+            clbDirections.Location = new Point(127, 34);
             clbDirections.Name = "clbDirections";
-            clbDirections.Size = new Size(519, 100);
+            clbDirections.Size = new Size(1046, 100);
             clbDirections.TabIndex = 20;
             // 
             // lblDirections
             // 
             lblDirections.AutoSize = true;
             lblDirections.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lblDirections.Location = new Point(668, 120);
+            lblDirections.Location = new Point(127, 5);
             lblDirections.Name = "lblDirections";
             lblDirections.Size = new Size(213, 21);
             lblDirections.TabIndex = 21;
